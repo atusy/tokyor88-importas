@@ -1,0 +1,92 @@
+/*
+.reveal div.slides {
+  border: solid black 1px;
+}
+*/
+
+body {
+  background-color: #EED;
+}
+
+/* 全体の基準となるフォントサイズを大きくする */
+.reveal {
+  font-size: 40px;
+  color: #111;
+}
+
+/* テーマが見出しを大文字化するのを防ぐ */
+.reveal h1, .reveal h2, .reveal h3 {
+  text-transform: none;
+  margin-bottom: .5em;
+}
+
+.reveal h1.title {
+  font-weight: bold;
+}
+
+.reveal h1.subtitle {
+  font-size: 1.6em;
+  color: gray;
+}
+
+.reveal h2.author {
+  margin-top: 1em;
+  font-size: 1.2em;
+}
+
+.reveal h3.date {
+  font-size: .8em;
+  color: gray;
+}
+
+.reveal pre, .reveal code {font-family: "Noto Sans Mono CJK JP Regular", monospace;}
+
+twitter-widget {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ソースコードのフォントサイズを大きくする */
+.reveal pre {
+  font-size: 0.9em
+}
+
+/* ソースコードの余白を調整する */
+/* preとdivで余白を指定しているのでpreの余白を消す */
+.reveal pre.sourceCode {
+  margin: 0 auto;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3) inset;
+}
+
+.reveal div.sourceCode {
+  margin: 20px 0
+}
+
+.reveal pre code {
+  padding: 10px;
+}
+
+/* 画像の枠と影を消す */
+.reveal section img {
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+
+/* HTMLウィジェットを中央揃えにする */
+.reveal div.html-widget {
+  margin: 0 auto;
+}
+
+/* .reveal div.slides { border: 1px solid black; } */
+
+.reveal ul ul, .reveal ul ol, .reveal ol ol, .reveal ol ul{
+  margin-left: 2em;
+}
+
+.reveal .slides section .col {
+  display: inline-block;
+  width: 400px;
+  vertical-align: top;
+}
