@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Atusy" />
-  <meta name="dcterms.date" content="2020-09-08" />
-  <title>importasパッケージでPythonみたいにパッケージにエイリアスをつけよう</title>
+  <meta name="dcterms.date" content="2020-09-18" />
+  <title>importas if Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -516,10 +516,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <div class="slides">
 
 <section>
-    <h1 class="title"><p>importasパッケージでPythonみたいにパッケージにエイリアスをつけよう</p></h1>
+    <h1 class="title">importas if Python</h1>
   <h1 class="subtitle">Tokyo.R 88</h1>
     <h2 class="author">Atusy</h2>
-    <h3 class="date">2020-09-08</h3>
+    <h3 class="date">2020-09-18</h3>
 </section>
 
 <section id="self-intro" class="title-slide slide level1"><h1></h1><div class="col" style="width:300px">
@@ -535,17 +535,263 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li><img data-src="https://icongr.am/feather/twitter.svg" /> <a href="https://twitter.com/Atsushi776" target="_blank">@Atsushi776</a></li>
 </ul>
 </div></section>
-<section id="pythonのアレをrで" class="title-slide slide level1"><h1>PythonのアレをRで！</h1><div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> datetime <span class="im">as</span> dt</span>
-<span id="cb1-2"><a href="#cb1-2"></a>dt.date(<span class="dv">2020</span>, <span class="dv">9</span>, <span class="dv">19</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; datetime.date(2020, 9, 19)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>ggplot2 <span class="op">%as%</span><span class="st"> </span>gg</span>
-<span id="cb2-2"><a href="#cb2-2"></a>gg<span class="op">$</span>ggplot</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; function (data = NULL, mapping = aes(), ..., environment = parent.frame()) </span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; {</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;     UseMethod(&quot;ggplot&quot;)</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; }</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; &lt;bytecode: 0x55e8397a1bf8&gt;</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; &lt;environment: namespace:ggplot2&gt;</span></span></code></pre></div></section>
+<section id="提供" class="title-slide slide level1"><h1>提供</h1><p><a href="https://github.com/sponsors/atusy" target="_blank"><img data-src="img-sponsors.png" alt="スポンサー様一覧" /></a></p>
+<p><a href="https://github.com/sponsors/atusy" class="uri" target="_blank">https://github.com/sponsors/atusy</a></p></section>
+<section><section id="conflicts" class="title-slide slide level1"><h1>パッケージの干渉👎</h1><div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mtcars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(mpg)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; Error in select(., mpg): unused argument (mpg)</span></span></code></pre></div></section><section id="入れ替わってる" class="slide level2">
+<h2>入れ替わってる？！</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>select</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; function (obj) </span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; UseMethod(&quot;select&quot;)</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; &lt;bytecode: 0x559b3a8758b0&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; &lt;environment: namespace:MASS&gt;</span></span></code></pre></div>
+</section></section>
+<section id="avoid-conflicts" class="title-slide slide level1"><h1>パッケージ::関数👎</h1><p>正直だるい</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ggplot2<span class="op">::</span><span class="kw">ggplot</span>(mtcars) <span class="op">+</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw">aes</span>(wt, mpg) <span class="op">+</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw">theme_classic</span>()</span></code></pre></div>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" /></p></section>
+<section id="python" class="title-slide slide level1"><h1>Pythonのアレが欲しい</h1><div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">import</span> datetime <span class="im">as</span> dt</span>
+<span id="cb4-2"><a href="#cb4-2"></a>dt.date(<span class="dv">2020</span>, <span class="dv">9</span>, <span class="dv">19</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; datetime.date(2020, 9, 19)</span></span></code></pre></div></section>
+<section><section id="importas" class="title-slide slide level1"><h1>📦importas🎉</h1><div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;atusy/importas&quot;</span>)</span></code></pre></div>
+<p>CRAN登録は間に合いませんでした……。</p>
+<p>スマン！！</p></section><section id="like-python" class="slide level2">
+<h2>Python風</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ggplot2 <span class="op">%as%</span><span class="st"> </span>gg</span>
+<span id="cb6-2"><a href="#cb6-2"></a>gg<span class="op">$</span><span class="kw">ggplot</span>(mtcars) <span class="op">+</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">aes</span>(wt, mpg) <span class="op">+</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">theme_classic</span>()</span></code></pre></div>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" /></p>
+</section><section id="like-r" class="slide level2">
+<h2>R風</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>gg &lt;-<span class="st"> </span><span class="kw">package</span>(ggplot2)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>gg<span class="op">$</span><span class="kw">ggplot</span>(mtcars) <span class="op">+</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">aes</span>(wt, mpg) <span class="op">+</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="st">  </span>gg<span class="op">$</span><span class="kw">theme_classic</span>()</span></code></pre></div>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" /></p>
+</section><section id="複数に同時" class="slide level2">
+<h2>複数に同時</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">importas</span>(<span class="dt">tb =</span> tibble, <span class="dt">td =</span> tidyr)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="st">`</span><span class="dt">%&gt;%</span><span class="st">`</span> &lt;-<span class="st"> </span>magrittr<span class="op">::</span><span class="st">`</span><span class="dt">%&gt;%</span><span class="st">`</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a>tb<span class="op">$</span><span class="kw">rownames_to_column</span>(mtcars) <span class="op">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="st">  </span>td<span class="op">$</span><span class="kw">nest</span>(<span class="dt">data =</span> <span class="op">-</span>rowname)</span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt; # A tibble: 32 x 2</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt;    rowname           data             </span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt;    &lt;chr&gt;             &lt;list&gt;           </span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt;  1 Mazda RX4         &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt;  2 Mazda RX4 Wag     &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt;  3 Datsun 710        &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;  4 Hornet 4 Drive    &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt;  5 Hornet Sportabout &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt;  6 Valiant           &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt;  7 Duster 360        &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt;  8 Merc 240D         &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt;  9 Merc 230          &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt; 10 Merc 280          &lt;tibble [1 × 11]&gt;</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; # … with 22 more rows</span></span></code></pre></div>
+</section></section>
+<section id="入力補完に対応" class="title-slide slide level1"><h1>入力補完に対応</h1><p><img data-src="img-auto-completion.png" alt="入力補完の例" /></p></section>
+<section><section id="完全一致のみ許可" class="title-slide slide level1"><h1>完全一致のみ許可</h1><div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>gg<span class="op">$</span>ggplo</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; Error: &#39;ggplo&#39; is not an exported object from &#39;namespace:ggplot2&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>gg<span class="op">$</span>ggplot</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; function (data = NULL, mapping = aes(), ..., environment = parent.frame()) </span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; {</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt;     UseMethod(&quot;ggplot&quot;)</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; }</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; &lt;bytecode: 0x559b3b6d2bf8&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; &lt;environment: namespace:ggplot2&gt;</span></span></code></pre></div></section><section id="通常のは前方一致" class="slide level2">
+<h2>通常の<code>$</code>は前方一致</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">identical</span>(</span>
+<span id="cb10-2"><a href="#cb10-2"></a>  mtcars<span class="op">$</span>mpg,</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  mtcars<span class="op">$</span>m</span>
+<span id="cb10-4"><a href="#cb10-4"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</section></section>
+<section id="ヘルプは見れない" class="title-slide slide level1"><h1>ヘルプは見れない</h1><div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>?gg<span class="op">$</span>ggplot</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co">#&gt; Warning in .helpForCall(topicExpr, parent.frame()): no method defined for</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt; function &#39;$&#39; and signature &#39;x = &quot;importas&quot;&#39;</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; Error in .helpForCall(topicExpr, parent.frame()): no documentation for function &#39;$&#39; and signature &#39;x = &quot;importas&quot;&#39;</span></span></code></pre></div></section>
+<section><section id="仕組み" class="title-slide slide level1"><h1>仕組み</h1></section><section id="エイリアスの実態" class="slide level2">
+<h2>エイリアスの実態</h2>
+<ul>
+<li><code>importas</code>クラスオブジェクト</li>
+<li>実態は名前付きリスト
+<ul>
+<li>値はすべて<code>NULL</code></li>
+<li>エクスポートされたオブジェクトを名前に持つ</li>
+<li>名前があるので入力補完が可能</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">str</span>(gg)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt; List of 518</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt;  $ .data                    : NULL</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt;  $ .pt                      : NULL</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt;  $ .stroke                  : NULL</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt;  $ %+%                      : NULL</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt;  $ %+replace%               : NULL</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt;  $ aes                      : NULL</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt;  $ aes_                     : NULL</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">#&gt;  $ aes_all                  : NULL</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#&gt;  $ aes_auto                 : NULL</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt;  $ aes_q                    : NULL</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt;  $ aes_string               : NULL</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co">#&gt;  $ after_scale              : NULL</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co">#&gt;  $ after_stat               : NULL</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="co">#&gt;  $ alpha                    : NULL</span></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co">#&gt;  $ annotate                 : NULL</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="co">#&gt;  $ annotation_custom        : NULL</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co">#&gt;  $ annotation_logticks      : NULL</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="co">#&gt;  $ annotation_map           : NULL</span></span>
+<span id="cb12-21"><a href="#cb12-21"></a><span class="co">#&gt;  $ annotation_raster        : NULL</span></span>
+<span id="cb12-22"><a href="#cb12-22"></a><span class="co">#&gt;  $ arrow                    : NULL</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a><span class="co">#&gt;  $ as_labeller              : NULL</span></span>
+<span id="cb12-24"><a href="#cb12-24"></a><span class="co">#&gt;  $ autolayer                : NULL</span></span>
+<span id="cb12-25"><a href="#cb12-25"></a><span class="co">#&gt;  $ autoplot                 : NULL</span></span>
+<span id="cb12-26"><a href="#cb12-26"></a><span class="co">#&gt;  $ AxisSecondary            : NULL</span></span>
+<span id="cb12-27"><a href="#cb12-27"></a><span class="co">#&gt;  $ benchplot                : NULL</span></span>
+<span id="cb12-28"><a href="#cb12-28"></a><span class="co">#&gt;  $ binned_scale             : NULL</span></span>
+<span id="cb12-29"><a href="#cb12-29"></a><span class="co">#&gt;  $ borders                  : NULL</span></span>
+<span id="cb12-30"><a href="#cb12-30"></a><span class="co">#&gt;  $ calc_element             : NULL</span></span>
+<span id="cb12-31"><a href="#cb12-31"></a><span class="co">#&gt;  $ combine_vars             : NULL</span></span>
+<span id="cb12-32"><a href="#cb12-32"></a><span class="co">#&gt;  $ continuous_scale         : NULL</span></span>
+<span id="cb12-33"><a href="#cb12-33"></a><span class="co">#&gt;  $ Coord                    : NULL</span></span>
+<span id="cb12-34"><a href="#cb12-34"></a><span class="co">#&gt;  $ coord_cartesian          : NULL</span></span>
+<span id="cb12-35"><a href="#cb12-35"></a><span class="co">#&gt;  $ coord_equal              : NULL</span></span>
+<span id="cb12-36"><a href="#cb12-36"></a><span class="co">#&gt;  $ coord_fixed              : NULL</span></span>
+<span id="cb12-37"><a href="#cb12-37"></a><span class="co">#&gt;  $ coord_flip               : NULL</span></span>
+<span id="cb12-38"><a href="#cb12-38"></a><span class="co">#&gt;  $ coord_map                : NULL</span></span>
+<span id="cb12-39"><a href="#cb12-39"></a><span class="co">#&gt;  $ coord_munch              : NULL</span></span>
+<span id="cb12-40"><a href="#cb12-40"></a><span class="co">#&gt;  $ coord_polar              : NULL</span></span>
+<span id="cb12-41"><a href="#cb12-41"></a><span class="co">#&gt;  $ coord_quickmap           : NULL</span></span>
+<span id="cb12-42"><a href="#cb12-42"></a><span class="co">#&gt;  $ coord_sf                 : NULL</span></span>
+<span id="cb12-43"><a href="#cb12-43"></a><span class="co">#&gt;  $ coord_trans              : NULL</span></span>
+<span id="cb12-44"><a href="#cb12-44"></a><span class="co">#&gt;  $ CoordCartesian           : NULL</span></span>
+<span id="cb12-45"><a href="#cb12-45"></a><span class="co">#&gt;  $ CoordFixed               : NULL</span></span>
+<span id="cb12-46"><a href="#cb12-46"></a><span class="co">#&gt;  $ CoordFlip                : NULL</span></span>
+<span id="cb12-47"><a href="#cb12-47"></a><span class="co">#&gt;  $ CoordMap                 : NULL</span></span>
+<span id="cb12-48"><a href="#cb12-48"></a><span class="co">#&gt;  $ CoordPolar               : NULL</span></span>
+<span id="cb12-49"><a href="#cb12-49"></a><span class="co">#&gt;  $ CoordQuickmap            : NULL</span></span>
+<span id="cb12-50"><a href="#cb12-50"></a><span class="co">#&gt;  $ CoordSf                  : NULL</span></span>
+<span id="cb12-51"><a href="#cb12-51"></a><span class="co">#&gt;  $ CoordTrans               : NULL</span></span>
+<span id="cb12-52"><a href="#cb12-52"></a><span class="co">#&gt;  $ cut_interval             : NULL</span></span>
+<span id="cb12-53"><a href="#cb12-53"></a><span class="co">#&gt;  $ cut_number               : NULL</span></span>
+<span id="cb12-54"><a href="#cb12-54"></a><span class="co">#&gt;  $ cut_width                : NULL</span></span>
+<span id="cb12-55"><a href="#cb12-55"></a><span class="co">#&gt;  $ derive                   : NULL</span></span>
+<span id="cb12-56"><a href="#cb12-56"></a><span class="co">#&gt;  $ discrete_scale           : NULL</span></span>
+<span id="cb12-57"><a href="#cb12-57"></a><span class="co">#&gt;  $ draw_key_abline          : NULL</span></span>
+<span id="cb12-58"><a href="#cb12-58"></a><span class="co">#&gt;  $ draw_key_blank           : NULL</span></span>
+<span id="cb12-59"><a href="#cb12-59"></a><span class="co">#&gt;  $ draw_key_boxplot         : NULL</span></span>
+<span id="cb12-60"><a href="#cb12-60"></a><span class="co">#&gt;  $ draw_key_crossbar        : NULL</span></span>
+<span id="cb12-61"><a href="#cb12-61"></a><span class="co">#&gt;  $ draw_key_dotplot         : NULL</span></span>
+<span id="cb12-62"><a href="#cb12-62"></a><span class="co">#&gt;  $ draw_key_label           : NULL</span></span>
+<span id="cb12-63"><a href="#cb12-63"></a><span class="co">#&gt;  $ draw_key_path            : NULL</span></span>
+<span id="cb12-64"><a href="#cb12-64"></a><span class="co">#&gt;  $ draw_key_point           : NULL</span></span>
+<span id="cb12-65"><a href="#cb12-65"></a><span class="co">#&gt;  $ draw_key_pointrange      : NULL</span></span>
+<span id="cb12-66"><a href="#cb12-66"></a><span class="co">#&gt;  $ draw_key_polygon         : NULL</span></span>
+<span id="cb12-67"><a href="#cb12-67"></a><span class="co">#&gt;  $ draw_key_rect            : NULL</span></span>
+<span id="cb12-68"><a href="#cb12-68"></a><span class="co">#&gt;  $ draw_key_smooth          : NULL</span></span>
+<span id="cb12-69"><a href="#cb12-69"></a><span class="co">#&gt;  $ draw_key_text            : NULL</span></span>
+<span id="cb12-70"><a href="#cb12-70"></a><span class="co">#&gt;  $ draw_key_timeseries      : NULL</span></span>
+<span id="cb12-71"><a href="#cb12-71"></a><span class="co">#&gt;  $ draw_key_vline           : NULL</span></span>
+<span id="cb12-72"><a href="#cb12-72"></a><span class="co">#&gt;  $ draw_key_vpath           : NULL</span></span>
+<span id="cb12-73"><a href="#cb12-73"></a><span class="co">#&gt;  $ dup_axis                 : NULL</span></span>
+<span id="cb12-74"><a href="#cb12-74"></a><span class="co">#&gt;  $ el_def                   : NULL</span></span>
+<span id="cb12-75"><a href="#cb12-75"></a><span class="co">#&gt;  $ element_blank            : NULL</span></span>
+<span id="cb12-76"><a href="#cb12-76"></a><span class="co">#&gt;  $ element_grob             : NULL</span></span>
+<span id="cb12-77"><a href="#cb12-77"></a><span class="co">#&gt;  $ element_line             : NULL</span></span>
+<span id="cb12-78"><a href="#cb12-78"></a><span class="co">#&gt;  $ element_rect             : NULL</span></span>
+<span id="cb12-79"><a href="#cb12-79"></a><span class="co">#&gt;  $ element_render           : NULL</span></span>
+<span id="cb12-80"><a href="#cb12-80"></a><span class="co">#&gt;  $ element_text             : NULL</span></span>
+<span id="cb12-81"><a href="#cb12-81"></a><span class="co">#&gt;  $ enexpr                   : NULL</span></span>
+<span id="cb12-82"><a href="#cb12-82"></a><span class="co">#&gt;  $ enexprs                  : NULL</span></span>
+<span id="cb12-83"><a href="#cb12-83"></a><span class="co">#&gt;  $ enquo                    : NULL</span></span>
+<span id="cb12-84"><a href="#cb12-84"></a><span class="co">#&gt;  $ enquos                   : NULL</span></span>
+<span id="cb12-85"><a href="#cb12-85"></a><span class="co">#&gt;  $ ensym                    : NULL</span></span>
+<span id="cb12-86"><a href="#cb12-86"></a><span class="co">#&gt;  $ ensyms                   : NULL</span></span>
+<span id="cb12-87"><a href="#cb12-87"></a><span class="co">#&gt;  $ expand_limits            : NULL</span></span>
+<span id="cb12-88"><a href="#cb12-88"></a><span class="co">#&gt;  $ expand_scale             : NULL</span></span>
+<span id="cb12-89"><a href="#cb12-89"></a><span class="co">#&gt;  $ expansion                : NULL</span></span>
+<span id="cb12-90"><a href="#cb12-90"></a><span class="co">#&gt;  $ expr                     : NULL</span></span>
+<span id="cb12-91"><a href="#cb12-91"></a><span class="co">#&gt;  $ Facet                    : NULL</span></span>
+<span id="cb12-92"><a href="#cb12-92"></a><span class="co">#&gt;  $ facet_grid               : NULL</span></span>
+<span id="cb12-93"><a href="#cb12-93"></a><span class="co">#&gt;  $ facet_null               : NULL</span></span>
+<span id="cb12-94"><a href="#cb12-94"></a><span class="co">#&gt;  $ facet_wrap               : NULL</span></span>
+<span id="cb12-95"><a href="#cb12-95"></a><span class="co">#&gt;  $ FacetGrid                : NULL</span></span>
+<span id="cb12-96"><a href="#cb12-96"></a><span class="co">#&gt;  $ FacetNull                : NULL</span></span>
+<span id="cb12-97"><a href="#cb12-97"></a><span class="co">#&gt;  $ FacetWrap                : NULL</span></span>
+<span id="cb12-98"><a href="#cb12-98"></a><span class="co">#&gt;  $ find_panel               : NULL</span></span>
+<span id="cb12-99"><a href="#cb12-99"></a><span class="co">#&gt;  $ flip_data                : NULL</span></span>
+<span id="cb12-100"><a href="#cb12-100"></a><span class="co">#&gt;  $ flipped_names            : NULL</span></span>
+<span id="cb12-101"><a href="#cb12-101"></a><span class="co">#&gt;  $ fortify                  : NULL</span></span>
+<span id="cb12-102"><a href="#cb12-102"></a><span class="co">#&gt;   [list output truncated]</span></span>
+<span id="cb12-103"><a href="#cb12-103"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr [1:2] &quot;importas&quot; &quot;list&quot;</span></span>
+<span id="cb12-104"><a href="#cb12-104"></a><span class="co">#&gt;  - attr(*, &quot;package&quot;)= symbol ggplot2</span></span></code></pre></div>
+</section><section id="演算子の中身" class="slide level2">
+<h2><code>$</code>演算子の中身</h2>
+<p><code>::</code>演算子と同様<code>getExportedValue</code>関数を使う</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>importas<span class="op">:::</span><span class="st">`</span><span class="dt">$.importas</span><span class="st">`</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co">#&gt; function(x, name) {</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt;   getExportedValue(attr(x, &quot;package&quot;, exact = TRUE), substitute(name))</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; }</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; &lt;bytecode: 0x559b4192b200&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; &lt;environment: namespace:importas&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="st">`</span><span class="dt">::</span><span class="st">`</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt; function (pkg, name) </span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; {</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt;     pkg &lt;- as.character(substitute(pkg))</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt;     name &lt;- as.character(substitute(name))</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt;     getExportedValue(pkg, name)</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; }</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt; &lt;bytecode: 0x559b39afda60&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt; &lt;environment: namespace:base&gt;</span></span></code></pre></div>
+</section><section id="したエイリアスの居場所" class="slide level2">
+<h2><code>&lt;-</code>したエイリアスの居場所</h2>
+<p><code>.GlobalEnv</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">ls</span>()</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="co">#&gt; [1] &quot;%&gt;%&quot; &quot;gg&quot;</span></span></code></pre></div>
+</section><section id="その他のエイリアスの居場所" class="slide level2">
+<h2>その他のエイリアスの居場所</h2>
+<p>サーチパスに<code>attach</code>した<code>"importas:alias"</code></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">ls</span>(<span class="dt">envir=</span><span class="kw">as.environment</span>(<span class="st">&quot;importas:alias&quot;</span>))</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#&gt; [1] &quot;gg&quot; &quot;tb&quot; &quot;td&quot;</span></span></code></pre></div>
+</section></section>
+<section><section id="余談" class="title-slide slide level1"><h1>余談</h1></section><section id="globalenv汚染禁止" class="slide level2">
+<h2><code>.GlobalEnv</code>汚染禁止</h2>
+<p>importas 0.1.0では<code>%as%</code>演算子や<code>importas</code>関数も<br />
+<code>.GlobalEnv</code>にエイリアスを作っていた</p>
+<p>が</p>
+<blockquote>
+<p>Thanks, but modification of the .GlobalEnv is a policy violation.</p>
+</blockquote>
+</section><section id="attach関数を使おう" class="slide level2">
+<h2><code>attach</code>関数を使おう</h2>
+<ul>
+<li>サーチパスを追加</li>
+<li><code>.GlobalEnv</code>汚染の回避に使える</li>
+<li>Good Practice (<code>?attach</code>)
+<ul>
+<li>基本的には<code>with</code>関数で代用せよ</li>
+<li>どうしても必要なら<code>on.exit</code>で<code>detach</code>せよ</li>
+</ul></li>
+</ul>
+<p>いや、<code>.onLoad</code>で<code>attach</code>して、<code>.unLoad</code>で<code>detach</code>したいんやけど……？</p>
+</section><section id="good-practice違反禁止" class="slide level2">
+<h2>Good Practice違反禁止？</h2>
+<p><code>attach</code>したら<code>on.exit</code>で<code>detach</code>しないと<br />
+R CMD checkに怒られる</p>
+<p>回避するには<code>do.call</code>を経由しよう。</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="kw">do.call</span>(<span class="st">&quot;attach&quot;</span>, <span class="kw">list</span>(<span class="dt">what =</span> <span class="ot">NULL</span>, <span class="dt">name =</span> <span class="st">&quot;importas:alias&quot;</span>))</span>
+<span id="cb17-3"><a href="#cb17-3"></a>}</span></code></pre></div>
+</section><section id="黒魔術は黒魔術を呼ぶ" class="slide level2">
+<h2>黒魔術は黒魔術を呼ぶ</h2>
+</section></section>
+<section id="enjoy" class="title-slide slide level1"><h1>Enjoy!!</h1></section>
     </div>
   </div>
 
